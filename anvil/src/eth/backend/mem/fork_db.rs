@@ -1,5 +1,9 @@
+use std::collections::BTreeMap;
+
 use crate::{
-    eth::backend::db::{Db, MaybeHashDatabase, SerializableState, StateDb},
+    eth::backend::db::{
+        Db, MaybeHashDatabase, SerializableAccountRecord, SerializableState, StateDb,
+    },
     revm::AccountInfo,
     Address, U256,
 };
@@ -28,7 +32,37 @@ impl Db for ForkedDatabase {
     }
 
     fn dump_state(&self) -> DatabaseResult<Option<SerializableState>> {
-        Ok(None)
+        let accounts = self
+            .inner()
+            .accounts()
+            .clone()
+            .read()
+            .clone()
+            .into_iter()
+            .map(|(k, v)| -> DatabaseResult<_> {
+                let code = if let Some(code) = v.code { code } else { todo!() }.to_checked();
+                let storage = self.inner().storage().clone().read().clone();
+                let storage = if let Some(store) = storage.get(&k) {
+                    store.clone().into_iter().collect()
+                } else {
+                    BTreeMap::new()
+                };
+                Ok((
+                    k,
+                    SerializableAccountRecord {
+                        nonce: v.nonce,
+                        balance: v.balance,
+                        code: code.bytes()[..code.len()].to_vec().into(),
+                        storage,
+                    },
+                ))
+            })
+            .collect::<Result<_, _>>()?;
+
+        println!("{:#?}", self.inner().storage().clone().read());
+        println!("{:#?}", accounts);
+
+        Ok(Some(SerializableState { accounts }))
     }
 
     fn load_state(&mut self, _buf: SerializableState) -> DatabaseResult<bool> {
