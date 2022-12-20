@@ -1,5 +1,3 @@
-use std::collections::BTreeMap;
-
 use crate::{
     eth::backend::db::{
         Db, MaybeHashDatabase, SerializableAccountRecord, SerializableState, StateDb,
@@ -8,7 +6,7 @@ use crate::{
     Address, U256,
 };
 use ethers::prelude::H256;
-use forge::revm::Database;
+use forge::revm::{Bytecode, Database, KECCAK_EMPTY};
 pub use foundry_evm::executor::fork::database::ForkedDatabase;
 use foundry_evm::executor::{
     backend::{snapshot::StateSnapshot, DatabaseResult},
@@ -35,18 +33,20 @@ impl Db for ForkedDatabase {
         let accounts = self
             .inner()
             .accounts()
-            .clone()
             .read()
             .clone()
             .into_iter()
             .map(|(k, v)| -> DatabaseResult<_> {
-                let code = if let Some(code) = v.code { code } else { todo!() }.to_checked();
-                let storage = self.inner().storage().clone().read().clone();
-                let storage = if let Some(store) = storage.get(&k) {
-                    store.clone().into_iter().collect()
-                } else {
-                    BTreeMap::new()
-                };
+                let code = v.code.unwrap_or_default().to_checked();
+
+                let storage = self
+                    .inner()
+                    .storage()
+                    .read()
+                    .get(&k)
+                    .map(|store| store.clone().into_iter().collect())
+                    .unwrap_or_default();
+
                 Ok((
                     k,
                     SerializableAccountRecord {
@@ -59,8 +59,6 @@ impl Db for ForkedDatabase {
             })
             .collect::<Result<_, _>>()?;
 
-        println!("{:#?}", self.inner().storage().clone().read());
-        println!("{:#?}", accounts);
 
         Ok(Some(SerializableState { accounts }))
     }
