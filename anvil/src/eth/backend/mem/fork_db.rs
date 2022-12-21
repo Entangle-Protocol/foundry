@@ -6,7 +6,9 @@ use crate::{
     Address, U256,
 };
 use ethers::prelude::H256;
-use forge::revm::{Bytecode, Database, KECCAK_EMPTY};
+use forge::{
+    revm::{Bytecode, Database, KECCAK_EMPTY}, executor::DatabaseRef,
+};
 pub use foundry_evm::executor::fork::database::ForkedDatabase;
 use foundry_evm::executor::{
     backend::{snapshot::StateSnapshot, DatabaseResult},
@@ -30,30 +32,29 @@ impl Db for ForkedDatabase {
     }
 
     fn dump_state(&self) -> DatabaseResult<Option<SerializableState>> {
-        let accounts = self
-            .inner()
-            .accounts()
-            .read()
+        // TODO: Maybe we want to dump the remote state also; just in case; would be for perf; in case the caching strategy fails
+        // Use CachedDb because is contains *OUR* changes *NOT* related to the remote and they are the ones we care about the most
+        let accounts  = self
+            .database()
+            .accounts
             .clone()
             .into_iter()
             .map(|(k, v)| -> DatabaseResult<_> {
-                let code = v.code.unwrap_or_default().to_checked();
-
-                let storage = self
-                    .inner()
-                    .storage()
-                    .read()
-                    .get(&k)
-                    .map(|store| store.clone().into_iter().collect())
-                    .unwrap_or_default();
+                let code = v
+                    .info
+                    .code
+                    .unwrap_or_else(|| {
+                        self.database().db.code_by_hash(v.info.code_hash).unwrap_or_default()
+                    })
+                    .to_checked();
 
                 Ok((
                     k,
                     SerializableAccountRecord {
-                        nonce: v.nonce,
-                        balance: v.balance,
+                        nonce: v.info.nonce,
+                        balance: v.info.balance,
                         code: code.bytes()[..code.len()].to_vec().into(),
-                        storage,
+                        storage: v.storage.into_iter().collect(),
                     },
                 ))
             })
