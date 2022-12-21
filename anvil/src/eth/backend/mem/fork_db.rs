@@ -63,8 +63,33 @@ impl Db for ForkedDatabase {
         Ok(Some(SerializableState { accounts }))
     }
 
-    fn load_state(&mut self, _buf: SerializableState) -> DatabaseResult<bool> {
-        Ok(false)
+    fn load_state(&mut self, state: SerializableState) -> DatabaseResult<bool> {
+        for (address, account) in state.accounts.into_iter() {
+            let old_account_nonce =
+                self.inner().accounts().read().get(&address).map(|a| a.nonce).unwrap_or_default();
+            // use max nonce in case account is imported multiple times with difference
+            // nonces to prevent collisions
+            let nonce = std::cmp::max(old_account_nonce, account.nonce);
+            println!("Inserting account: {:?}\n Data: {:#?}", address, account);
+            self.insert_account(
+                address,
+                AccountInfo {
+                    balance: account.balance,
+                    code_hash: KECCAK_EMPTY,
+                    nonce,
+                    code: if account.code.0.is_empty() {
+                        None
+                    } else {
+                        Some(Bytecode::new_raw(account.code.0).to_checked())
+                    },
+                },
+            );
+
+            for (slot, val) in account.storage {
+                self.set_storage_at(address, slot, val)?;
+            }
+        }
+        Ok(true)
     }
 
     fn snapshot(&mut self) -> U256 {
