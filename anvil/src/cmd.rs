@@ -136,7 +136,7 @@ pub struct NodeArgs {
 
     #[clap(
         long,
-        help = "This is an alias for bot --load-state and --dump-state. It initializes the chain with the state stored at the file, if it exists, and dumps the chain's state on exit",
+        help = "This is an alias for both --load-state and --dump-state. It initializes the chain with the state stored at the file, if it exists, and dumps the chain's state on exit",
         value_name = "PATH",
         value_parser = StateFile::parse,
         conflicts_with_all = &["init", "dump_state", "load_state"]
