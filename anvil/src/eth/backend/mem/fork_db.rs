@@ -14,6 +14,7 @@ use foundry_evm::executor::{
     backend::{snapshot::StateSnapshot, DatabaseResult},
     fork::database::ForkDbSnapshot,
 };
+use tracing::trace;
 
 /// Implement the helper for the fork database
 impl Db for ForkedDatabase {
@@ -71,7 +72,7 @@ impl Db for ForkedDatabase {
             // use max nonce in case account is imported multiple times with difference
             // nonces to prevent collisions
             let nonce = std::cmp::max(old_account_nonce, account.nonce);
-            println!("Inserting account: {:?}\n Data: {:#?}", address, account);
+            trace!(target: "fork_db", "Inserting account: {:?}\n Data: {:#?}", address, account);
             self.insert_account(
                 address,
                 AccountInfo {
