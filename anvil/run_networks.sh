@@ -13,3 +13,6 @@ anvil  --host "${OUTGOING_IP}" --port '8594' --accounts 3 --balance 1000000000 -
 
 # fantom
 anvil  --host "${OUTGOING_IP}" --port '8595' --accounts 3 --balance 1000000000 --block-time 10 --mnemonic "${MNEMONIC}" --fork-url 'https://ftm.getblock.io/086f3fe0-6268-4d76-8521-ea289cc09fd5/mainnet/' --gas-price 100000
+
+# polygon
+anvil  --host "${OUTGOING_IP}" --port '8596' --accounts 3 --balance 1000000000 --block-time 10 --mnemonic "${MNEMONIC}" --fork-url 'https://matic.getblock.io/01bf3536-694c-4c7c-945c-9c6e7e47abf2/mainnet/' --gas-price 100000
