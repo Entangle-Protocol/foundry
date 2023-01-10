@@ -1,18 +1,37 @@
+#!/usr/bin/env bash
 
-# optimism
-anvil  --host "${OUTGOING_IP}" --port '8591' --accounts 3 --balance 1000000000 --block-time 10 --mnemonic "${MNEMONIC}" --fork-url 'https://op.getblock.io/d025d1f8-a350-4197-88ff-6432e52fc034/mainnet/' --gas-price 100000
+MNEMONIC=$(cat .secret)
 
-# bsc
-anvil  --host "${OUTGOING_IP}" --port '8592' --accounts 3 --balance 1000000000 --block-time 10 --mnemonic "${MNEMONIC}" --fork-url 'https://bsc.getblock.io/094313a6-cbce-4df0-a835-2326697662cf/mainnet/' --gas-price 100000
+# should be host external address
+IP_ADDRESS='127.0.0.1'
 
-# avalanche
-anvil  --host "${OUTGOING_IP}" --port '8593' --accounts 3 --balance 1000000000 --block-time 10 --mnemonic "${MNEMONIC}" --fork-url 'https://avax.getblock.io/mainnet/126012a1-9cf6-4c9c-8007-650d8e25d5c5/ext/bc/C/rpc' --gas-price 100000
-
-# arbitrum
-anvil  --host "${OUTGOING_IP}" --port '8594' --accounts 3 --balance 1000000000 --block-time 10 --mnemonic "${MNEMONIC}" --fork-url 'https://arb.getblock.io/e7f30447-6684-4d07-87e0-ee392fee862c/mainnet/' --gas-price 100000
-
-# fantom
-anvil  --host "${OUTGOING_IP}" --port '8595' --accounts 3 --balance 1000000000 --block-time 10 --mnemonic "${MNEMONIC}" --fork-url 'https://ftm.getblock.io/086f3fe0-6268-4d76-8521-ea289cc09fd5/mainnet/' --gas-price 100000
-
-# polygon
-anvil  --host "${OUTGOING_IP}" --port '8596' --accounts 3 --balance 1000000000 --block-time 10 --mnemonic "${MNEMONIC}" --fork-url 'https://matic.getblock.io/01bf3536-694c-4c7c-945c-9c6e7e47abf2/mainnet/' --gas-price 100000
+case $1 in
+    "teth")
+        # ethereum
+        anvil  --host "${IP_ADDRESS}" --port '8590' --accounts 3 --balance 1000000000000 --block-time 10 --mnemonic "${MNEMONIC}" --fork-url 'https://tame-solemn-surf.quiknode.pro/54c2bb653513d229c7bcdc195f3db78f2e3beae8/' --gas-price 100000 > ./eth_log.log &
+        ;;
+    "tbsc")
+        # bsc
+        anvil  --host "${IP_ADDRESS}" --port '8591' --accounts 3 --balance 1000000000000 --block-time 10 --mnemonic "${MNEMONIC}" --fork-url 'https://holy-powerful-model.bsc.discover.quiknode.pro/13afa7fc2c4c3b92c1d6857617ab288a1ee4d821/' --gas-price 100000 > ./bsc_log.log &
+        ;;
+    "topt")
+        # optimism
+        anvil  --host "${IP_ADDRESS}" --port '8592' --accounts 3 --balance 1000000000000 --block-time 10 --mnemonic "${MNEMONIC}" --fork-url 'https://holy-fabled-meme.optimism.quiknode.pro/9c28139d84f33e248177c64a8cb20d27121d91d6/' --gas-price 100000 > ./opt_log.log &
+        ;;
+    "tavax")
+        # avalanche
+        anvil  --host "${IP_ADDRESS}" --port '8593' --accounts 3 --balance 1000000000000 --block-time 10 --mnemonic "${MNEMONIC}" --fork-url 'https://tiniest-purple-liquid.avalanche-mainnet.quiknode.pro/5e352b72065b22ca04b9d1b5d8f739546110a77a/ext/bc/C/rpc' --gas-price 100000 > ./avax_log.log &
+        ;;
+    "tarb")
+        # arbitrum
+        anvil  --host "${IP_ADDRESS}" --port '8594' --accounts 3 --balance 1000000000000 --block-time 10 --mnemonic "${MNEMONIC}" --fork-url 'https://lingering-practical-theorem.arbitrum-mainnet.quiknode.pro/b45639b0be2a7a149c4ef67053d51e60db6cf4bc/' --gas-price 100000 > ./arb_log.log &
+        ;;
+    "tftm")
+        # fantom
+        anvil  --host "${IP_ADDRESS}" --port '8595' --accounts 3 --balance 1000000000000 --block-time 10 --mnemonic "${MNEMONIC}" --fork-url 'https://boldest-neat-model.fantom.quiknode.pro/46694b4ef14795ac05e7c983478d427e35b49fc2/' --gas-price 100000 > ./ftm_log.log &
+        ;;
+    "tmat")
+        # polygon
+        anvil  --host "${IP_ADDRESS}" --port '8596' --accounts 3 --balance 1000000000000 --block-time 10 --mnemonic "${MNEMONIC}" --fork-url 'https://powerful-summer-sanctuary.matic.quiknode.pro/2a89d5b192315c49cdbbd6ed4f48c55dc317acfb/' --gas-price 100000 > ./mat_log.log &
+        ;;
+esac
