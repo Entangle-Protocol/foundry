@@ -83,3 +83,11 @@ Gas Limit
 
 Listening on 127.0.0.1:8545
 ```
+
+## Entangle run
+
+Put mnemonic phrase into .secret file
+
+Run ./run_networks.sh with network name as param
+
+To stop anvil run ./stop_anvil

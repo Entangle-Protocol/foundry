@@ -3,7 +3,7 @@
 MNEMONIC=$(cat .secret)
 
 # should be host external address
-IP_ADDRESS='192.168.1.166'
+IP_ADDRESS='127.0.0.1'
 
 case $1 in
     "teth")
